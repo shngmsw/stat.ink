@@ -100,11 +100,7 @@ class TimezoneDialog extends Dialog
                 ),
                 Html::tag(
                     'span',
-                    Html::encode(sprintf(
-                        '%s (%s)',
-                        $this->renderOffset($tz),
-                        $tz->identifier
-                    )),
+                    Html::encode($this->renderOffset($tz)),
                     ['class' => 'd-none d-sm-inline small']
                 ),
             ]),
@@ -167,19 +163,20 @@ class TimezoneDialog extends Dialog
 
     private function renderOffset(Timezone $tz): string
     {
-        $offset = (new DateTimeImmutable())
+        $time = (new DateTimeImmutable())
             ->setTimestamp($_SERVER['REQUEST_TIME'] ?? time())
-            ->setTimezone(new DateTimeZone($tz->identifier))
-            ->getOffset();
+            ->setTimezone(new DateTimeZone($tz->identifier));
+        $offset = $time->getOffset();
 
         $isEast = $offset >= 0;
         $offset = abs($offset);
 
         return sprintf(
-            '%s%02d:%02d',
+            '%s%02d:%02d (%s)',
             $isEast ? '+' : '-',
             floor($offset / 3600),
-            floor(($offset % 3600) / 60)
+            floor(($offset % 3600) / 60),
+            $time->format('T')
         );
     }
 }
