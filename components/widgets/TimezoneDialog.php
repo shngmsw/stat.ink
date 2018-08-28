@@ -69,14 +69,16 @@ class TimezoneDialog extends Dialog
     private function renderTimezoneDetail(Timezone $tz, bool $renderGroup): string
     {
         $flags = implode(' ', array_map(
-            function (Country $country): string {
-                $flag = Html::tag('span', '', ['class' => [
-                    'flag-icon',
-                    'flag-icon-' . $country->key,
-                ]]);
+            function (?Country $country): string {
+                $flag = $country
+                    ? Html::tag('span', '', ['class' => [
+                        'flag-icon',
+                        'flag-icon-' . $country->key,
+                    ]])
+                    : '';
                 return FA::hack($flag)->fw();
             },
-            $tz->countries
+            array_slice(array_merge($tz->countries, [null, null]), 0, 2) // always 2 elements
         ));
 
         $ret = '';
